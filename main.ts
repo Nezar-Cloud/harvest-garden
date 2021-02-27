@@ -2,7 +2,24 @@ namespace SpriteKind {
     export const Veggie = SpriteKind.create()
     export const Sprout = SpriteKind.create()
 }
+function rabbit_go_after_sprout () {
+    sprouts = sprites.allOfKind(SpriteKind.Sprout)
+    if(target_sprout == null || target_sprout.kind()== SpriteKind.Veggie){
+    if (sprouts.length>0){ 
+    sprout_index = randint(0, sprouts.length - 1)
+    target_sprout = sprouts[sprout_index]
+    target_sprout.say("save me!")
+    rabbit.follow(target_sprout,50)
+
+    }
+    }
+}
+let ground_tile: tiles.Location = null
+let ground_index = 0
 let sprout: Sprite = null
+let target_sprout: Sprite = null
+let sprout_index = 0
+let sprouts: Sprite[] = []
 let veggies = [
 img`
     . . . . . . . . . . . . . . . . 
@@ -179,19 +196,35 @@ controller.moveSprite(player)
 scene.cameraFollowSprite(player)
 info.player1.setScore(0)
 info.player2.setScore(0)
+rabbit.z = 10
 let fieldTiles = tiles.getTilesByType(assets.tile`tile1`)
-game.onUpdateInterval(100, function () {
-    if (fieldTiles.length>0){
- sprout = sprites.create(sproutImg, SpriteKind.Sprout)
-    let ground_index = randint(0, fieldTiles.length-1)
-    let ground_tile  = fieldTiles[ground_index] 
-    tiles.placeOnTile(sprout,ground_tile)
-    fieldTiles.removeAt(ground_index)
+game.onUpdateInterval(500, function () {
+    if (fieldTiles.length > 0) {
+        sprout = sprites.create(sproutImg, SpriteKind.Sprout)
+        ground_index = randint(0, fieldTiles.length - 1)
+        ground_tile = fieldTiles[ground_index]
+        tiles.placeOnTile(sprout, ground_tile)
+        fieldTiles.removeAt(ground_index)
+        rabbit_go_after_sprout()
     }
+})
+sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Sprout, function(rabbit: Sprite, sprout: Sprite) {
+  info.player2.changeScoreBy(1) 
+  turn_sprout_veggie(sprout, rabbit) 
+   rabbit_go_after_sprout()
    
 })
-function rabbit_go_after_sprout(){
-    let sprouts = sprites.allOfKind(SpriteKind.Sprout)
-    let sprout_index = randint(0, sprouts.length - 1)
-    let target_sprout = sprouts[sprout_index]
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Sprout, function(cat: Sprite, sprout: Sprite) {
+  info.player1.changeScoreBy(1)  
+   turn_sprout_veggie(sprout, cat)
+   rabbit_go_after_sprout()
+
+   
+})
+function  turn_sprout_veggie(sprout: Sprite, who_to_follow: Sprite){
+   sprout.setKind(SpriteKind.Veggie)
+   sprout.setImage(veggies[randint(0, veggies.length-1)]) 
+   sprout.say("") 
+   sprout.follow (who_to_follow)
+
 }
