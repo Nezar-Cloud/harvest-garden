@@ -209,13 +209,13 @@ game.onUpdateInterval(500, function () {
     }
 })
 sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Sprout, function(rabbit: Sprite, sprout: Sprite) {
-  info.player2.changeScoreBy(1) 
+ add_score(info.player2, false)
   turn_sprout_veggie(sprout, rabbit) 
    rabbit_go_after_sprout()
    
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Sprout, function(cat: Sprite, sprout: Sprite) {
-  info.player1.changeScoreBy(1)  
+  add_score(info.player1, true) 
    turn_sprout_veggie(sprout, cat)
    rabbit_go_after_sprout()
 
@@ -227,4 +227,12 @@ function  turn_sprout_veggie(sprout: Sprite, who_to_follow: Sprite){
    sprout.say("") 
    sprout.follow (who_to_follow)
 
+} 
+function add_score (playerInfo: info.PlayerInfo, win: boolean){
+    playerInfo.changeScoreBy(1)
+    if (playerInfo.score() == 10){
+        pause(100) 
+
+        game.over(win)
+    }
 }
